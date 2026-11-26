@@ -1,6 +1,6 @@
 # Laboratorio 1 — Bitácora de auditoría de la cadena de suministro
 
-- **Autor/a:** Alejandro Revilla Blanco
+- **Autor/a:** Alejandro Revilla
 - **Repositorio:** https://github.com/alejandrorevillaEng/reportaudit-lab
 - **Sistema operativo y versión de Python usados:** Ubuntu 24.04 (WSL2), Python 3.12.3
 - **Compañero revisor:** `isramrtnz` (Israel Gallego), colaborador con permiso de escritura

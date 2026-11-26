@@ -3,7 +3,7 @@
 - Repositorio: https://github.com/alejandrorevillaEng/reportaudit-lab
 - Versión: v1.0.0
 - Fecha: 2026-11-26
-- Responsable: Alejandro Revilla Blanco
+- Responsable: Alejandro Revilla
 
 > Índice de evidencias frente a la Cyber Resilience Act (Reglamento (UE) 2024/2847).
 > No es una declaración de conformidad: dice qué está demostrado y cómo comprobarlo.

@@ -1,0 +1,33 @@
+﻿VerificaciÃ³n de la Release v1.0.0 como cliente (GitHub CLI 2.105.0).
+Descarga: gh release download v1.0.0 --repo alejandrorevillaEng/reportaudit-lab
+
+=== sha256sum -c SHA256SUMS ===
+reportaudit-1.0.0.tar.gz: OK
+reportaudit-sbom.cdx.json: OK
+
+=== gh attestation verify reportaudit-1.0.0.tar.gz --repo alejandrorevillaEng/reportaudit-lab ===
+Verification succeeded (exit 0; gh 2.105 only prints output with --format json).
+{"builder":"https://github.com/alejandrorevillaEng/reportaudit-lab/.github/workflows/publicar-version.yml@refs/tags/v1.0.0","predicate":"https://slsa.dev/provenance/v1","subject":["reportaudit-1.0.0.tar.gz"]}
+
+=== gh attestation verify ... --predicate-type https://cyclonedx.org/bom ===
+Verification succeeded (exit 0; gh 2.105 only prints output with --format json).
+{"predicate":"https://cyclonedx.org/bom","subject":["reportaudit-1.0.0.tar.gz"]}
+
+=== sha256sum (original vs alterado) ===
+2d3a9885e6f28c85617c700820e9886c117afb92a7115cd22b55390135af98bd  reportaudit-1.0.0.tar.gz
+fe922df171b523536bc71e0467157ad28465dc9bac1571fc4618094f5d57f10f  alterado.tar.gz
+
+=== gh attestation verify alterado.tar.gz (debe fallar) ===
+gh : 
+En C:\Users\aleja\AppData\Local\Temp\opencode\verificar_release_win.ps1: 24 Carácter: 8
++ $err = gh attestation verify alterado.tar.gz --repo $repo 2>&1 | Out- ...
++        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Error: HTTP 404: Not Found (https://api.github.com/repos/alejandrorevillaEng/reportaudit-lab/attestations/sha256:fe922d
+f171b523536bc71e0467157ad28465dc9bac1571fc4618094f5d57f10f?per_page=30&predicate_type=https%3A%2F%2Fslsa.dev%2Fprovenan
+ce%2Fv1)
+exit=1
+
+ConclusiÃ³n: la huella detecta la manipulaciÃ³n y la atestaciÃ³n no existe para el hash alterado (HTTP 404).

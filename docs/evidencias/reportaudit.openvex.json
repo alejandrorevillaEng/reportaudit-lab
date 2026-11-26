@@ -1,0 +1,16 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://github.com/alejandrorevillaEng/reportaudit-lab/vex/2026-001",
+  "author": "Alejandro Revilla Blanco <263216821+alejandrorevillaEng@users.noreply.github.com>",
+  "timestamp": "2026-11-26T00:00:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": { "name": "GHSA-2g68-c3qc-8985" },
+      "products": [ { "@id": "pkg:pypi/werkzeug@3.0.1" } ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "El aviso afecta al depurador interactivo de Werkzeug (Consola de Depuración). ReportAudit nunca lo activa: app/servicio.py:64 fija debug=False y el servicio solo expone los endpoints /, /reportes y /convertir. No hay código que acepte el PIN del depurador ni que evalúe expresiones en el entorno de depuración, por lo que la ruta vulnerable no se ejecuta. Aun así, la dependencia se actualiza a una versión corregida en el PR de seguridad: el VEX documenta el riesgo, no sustituye el parche."
+    }
+  ]
+}

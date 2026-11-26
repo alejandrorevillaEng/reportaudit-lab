@@ -205,19 +205,19 @@ Trivy 0.74.0 informó de **13 vulnerabilidades** en `requirements.txt` (tipo `pi
 ## Checklist de entrega (sección 8)
 
 - [x] Repositorio público con el commit de importación, el de la plantilla y los PRs de configuración/corrección fusionados.
-- [x] `main` protegida: PR, una aprobación requerida, resolución de conversaciones y checks SAST obligatorios (los dos SCA/secretos se añaden en la Parte P).
+- [x] `main` protegida: PR, una aprobación requerida, resolución de conversaciones y cuatro checks obligatorios: `SAST - SonarQube Cloud`, `SAST - CodeQL`, `SCA - pip-audit` y `Secretos - Gitleaks`.
 - [x] Colaborador revisor `isramrtnz` añadido y aceptado.
 - [x] Proyecto de SonarQube Cloud con `SONAR_TOKEN` en Actions y claves reales en `sonar-project.properties`.
 - [x] Captura del commit bloqueado por Semgrep (`docs/evidencias/pre-commit-bloqueo.txt` + captura en el Word).
 - [x] Alertas de CodeQL en estado Fixed tras la corrección.
 - [x] `docs/evidencias/` con SBOM antes/después, salidas de Grype y Trivy antes/después y VEX.
 - [x] PR de auditoría con la plantilla internacional, tabla de hallazgos, VEX enlazado y credenciales a rotar declaradas.
-- [ ] Secciones O–T y documentación final (se completan al cierre del laboratorio).
+- [x] Secciones O–T y documentación final completadas.
 - [x] `.github/PULL_REQUEST_TEMPLATE.md` en `main`; commits y PRs con Conventional Commits y comentarios etiquetados.
-- [ ] Regla propia de Gitleaks y puertas SCA/secretos (Partes O y P).
-- [ ] `SECURITY.md`, simulacro, release v1.0.0, Scorecard y expediente CRA (Partes Q–T).
+- [x] Regla propia de Gitleaks y puertas SCA/secretos (Partes O y P).
+- [x] `SECURITY.md`, simulacro, release v1.0.0, Scorecard y expediente CRA (Partes Q–T).
 
-> Nota de transparencia: GitHub no permite que el autor apruebe su propio PR. Los PRs se han fusionado con privilegios de administrador y se ha dejado constancia en cada review; la aprobación formal de `isramrtnz` debe registrarse en su cuenta.
+> Nota de transparencia: GitHub no permite que el autor apruebe su propio PR. `isramrtnz` aprobó formalmente los PRs #18, #19 y #26; el resto se fusionó con privilegios de administrador y se dejó constancia por escrito en cada review. En el PR final se le ha pedido revisión como auditor externo.
 
 ---
 
@@ -232,8 +232,13 @@ Trivy 0.74.0 informó de **13 vulnerabilidades** en `requirements.txt` (tipo `pi
 | Historial, con regla propia | `gitleaks git . -c .gitleaks.toml` | 2 | `390d7cc` (importación) |
 | Historial, tras .gitleaksignore | `gitleaks git . -c .gitleaks.toml` | 0 | Ninguno (baseline de 2 huellas rotadas) |
 
-¿Por qué el código actual está limpio y el historial no? ¿Qué medida de la Parte M cierra el riesgo
-y cuál no lo cierra? *(Se completa en el PR final.)*
+¿Por qué el código actual está limpio y el historial no? Porque las credenciales se movieron a
+variables de entorno (Parte M), pero Git conserva para siempre el commit `390d7cc` donde estaban
+en claro: borrarlas del código no las borra del historial. La medida que cierra el riesgo es
+**rotar** las credenciales; cambiar el archivo no. Como las dos credenciales ya estaban rotadas,
+`.gitleaksignore` las baselinea con dos huellas (`useDefault = true`) y el pipeline sigue detectando
+cualquier credencial nueva. El canal de Gitleaks es privado (`--redact`) para no volver a filtrar
+los valores. Evidencia: `docs/evidencias/gitleaks-*.txt`.
 
 ### P. Puertas obligatorias en main
 
@@ -244,33 +249,91 @@ y cuál no lo cierra? *(Se completa en el PR final.)*
 | SCA - pip-audit | Sí | **Fail** (werkzeug 3.0.1 vulnerable) |
 | Secretos - Gitleaks | Sí | Pass |
 
+Los cuatro contextos se fijaron en la protección de `main` en el PR #24. Para demostrar que la
+puerta SCA no es decorativa se abrió el **draft PR #25** (`test/puerta-sca`) restaurando las
+versiones vulnerables de `requirements.txt`/`requirements.in` del commit de importación:
+`SCA - pip-audit` falló con *25 known vulnerabilities in 3 packages* y `exit code 1`. El PR se
+cerró sin fusionar y la rama se borró; la salida quedó en `docs/evidencias/puerta-sca-fallida.txt`
+y el run en https://github.com/alejandrorevillaEng/reportaudit-lab/actions/runs/45873287883.
+El check que falló era obligatorio, así que Git habría bloqueado el merge aunque nadie lo
+hubiera cerrado a mano.
+
 ### Q. Divulgación coordinada (simulacro)
 
-- Informe recibido de (usuario de GitHub): *(por completar)*
-- Identificador del borrador de aviso (GHSA-...): *(por completar)*
-- Severidad y vector CVSS: *(por completar)*
+- Informe recibido de (usuario de GitHub): `isramrtnz`, a través de *Security → Report a
+  vulnerability*; rol en el aviso: `reporter`. Yo actué como responsable del repositorio y
+  remediation developer.
+- Identificador del borrador de aviso: `GHSA-h9wj-g8cp-pwgx`
+  (https://github.com/alejandrorevillaEng/reportaudit-lab/security/advisories/GHSA-h9wj-g8cp-pwgx).
+  Estado `draft`, `published_at = null`, visible solo para colaboradores del aviso.
+  Resumen en `docs/evidencias/aviso-borrador-ghsa.md`.
+- Severidad y vector CVSS: `high`, `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:L` (8.2).
 - CWE: CWE-89 (SQL Injection)
-- Versiones afectadas / versión corregida: < 1.0.0 / 1.0.0
+- Versiones afectadas / versión corregida: `< 1.0.0` / `1.0.0`
+- CVE: no solicitado. El simulacro no activa la obligación de notificación de la CRA: el
+  producto no se ha puesto en servicio en la Unión Europea, es un ejercicio de clase y la
+  vulnerabilidad ya estaba corregida antes de publicar v1.0.0.
+
+¿Por qué no un Issue público? Porque publicaría la falla antes del parche y daría a un atacante
+el camino de explotación. El borrador privado permite acordar el texto, fijar la versión
+corregida y decidir cuándo (o si) se publica.
 
 ### R. Versión 1.0.0 verificable
 
 | Comprobación | Comando | Resultado |
 |---|---|---|
-| Huellas SHA-256 | `sha256sum -c SHA256SUMS` | *(por completar)* |
-| Procedencia (SLSA) | `gh attestation verify reportaudit-1.0.0.tar.gz --repo alejandrorevillaEng/reportaudit-lab` | *(por completar)* |
-| SBOM atestado | `gh attestation verify ... --predicate-type https://cyclonedx.org/bom` | *(por completar)* |
-| Archivo alterado | `gh attestation verify alterado.tar.gz --repo ...` | *(por completar)* |
+| Huellas SHA-256 | `sha256sum -c SHA256SUMS` | `OK` para `reportaudit-1.0.0.tar.gz` y `reportaudit-sbom.cdx.json` |
+| Procedencia (SLSA) | `gh attestation verify reportaudit-1.0.0.tar.gz --repo alejandrorevillaEng/reportaudit-lab` | Exit 0; predicate `https://slsa.dev/provenance/v1`, builder `.github/workflows/publicar-version.yml@refs/tags/v1.0.0` |
+| SBOM atestado | `gh attestation verify ... --predicate-type https://cyclonedx.org/bom` | Exit 0; predicate `https://cyclonedx.org/bom`, sujeto `reportaudit-1.0.0.tar.gz` |
+| Archivo alterado | `gh attestation verify alterado.tar.gz --repo ...` | Falla: huella `fe922df1…` distinta de `2d3a9885…` y HTTP 404 al buscar la atestación de ese hash |
+
+La Release se publicó con el tag anotado `v1.0.0` sobre `f95eabf` ([run](https://github.com/alejandrorevillaEng/reportaudit-lab/actions/runs/45874401352),
+[release](https://github.com/alejandrorevillaEng/reportaudit-lab/releases/tag/v1.0.0)) y contiene
+cinco archivos: paquete, SBOM, `SHA256SUMS` y dos bundles `.sigstore.json`. La verificación
+completa, incluida la del archivo manipulado, está en `docs/evidencias/verificacion-release-v1.0.0.txt`.
+`gh` 2.105 no imprime nada en éxito; se usó `--format json` para dejar constancia del builder y del
+predicate. Las huellas detectan una descarga corrupta o un archivo cambiado; la procedencia
+detecta además un archivo sustituido aunque el atacante cambie también `SHA256SUMS`. Ninguna de
+las tres comprobaciones demuestra que el código sea seguro: eso lo hacen los checks de cada PR.
 
 ### S. Madurez (OpenSSF Scorecard)
 
 | Check | Puntuación (0–10) | Qué la explica |
 |---|---|---|
-| Puntuación global | *(por completar)* | |
-| *(por completar)* | | |
+| Puntuación global | **6.2** | [scorecard.dev](https://scorecard.dev/viewer/?uri=github.com/alejandrorevillaEng/reportaudit-lab), datos [JSON](https://api.scorecard.dev/projects/github.com/alejandrorevillaEng/reportaudit-lab), [run](https://github.com/alejandrorevillaEng/reportaudit-lab/actions/runs/45874919936), 2026-11-26 |
+| Branch-Protection | -1 (sin datos) | El token de Actions no puede leer reglas clásicas; `main` sí tiene 4 checks y 1 aprobación. No es un fallo de configuración. |
+| Pinned-Dependencies | 0 | 0 de 12 acciones de GitHub y 0 de 5 de terceros fijadas por hash; usamos etiquetas `@v6`/`@v4`. Reto opcional S.3 pendiente. |
+| Code-Review | 0 | Solo 1 de 12 cambioset aparece aprobado formalmente: GitHub no permite aprobar PRs ya fusionados y parte de la historia se fusionó con `--admin`. Queda documentado en la nota de transparencia. |
+| Maintained | 0 | Repositorio creado hace menos de 90 días; es antigüedad, no seguridad. |
+| License / Fuzzing | 0 | Sin `LICENSE` ni fuzzing; fuera del alcance de este laboratorio. |
+| Security-Policy | 10 | `SECURITY.md` en la raíz. |
+| Token-Permissions | 10 | Permisos mínimos en los tres workflows. |
+| Dependency-Update-Tool | 10 | Dependabot configurado. |
+| Vulnerabilities | 10 | 0 vulnerabilidades abiertas. |
+| Signed-Releases | 8 | 1 de 1 releases con artefacto firmado; Scorecard reconoce el bundle, no el `.tar.gz`. |
+| SAST | 9 | CodeQL en 28 de 30 commits. |
+
+Detalle completo en `docs/evidencias/scorecard-resultados.md`. El check más útil para elegir una
+dependencia es `Vulnerabilities` junto con `Maintained`; el más engañoso sin contexto es
+`Maintained` (0 por proyecto joven) o `Branch-Protection` (-1 por permisos del token). Una
+puntuación no es una certificación: mide prácticas observables, no ausencia de fallos de lógica.
+
+El reto S.3 (fijar acciones por hash) se deja como mejora futura a propósito: alteraría los tres
+workflows revisados y obligaría a repetir la release; se prefiere conservar la trazabilidad de
+esta entrega.
 
 ### T. Expediente de evidencias
 
 Ver `docs/cra/expediente-evidencias.md`.
 
-Compara el expediente con tu respuesta B5 de la Práctica 2: ¿qué evidencia imaginaste que ahora
-existe de verdad, y cuál sigue sin existir? *(Se completa en el PR final.)*
+Comparado con la respuesta B5 de la Práctica 2: imaginábamos un SBOM, una política de divulgación
+y una firma de releases. Ahora existen de verdad y, además, con un índice de 12 filas donde cada
+enlace tiene un comando o una secuencia de clics para verificarlo sin fiarse del autor
+(`docs/cra/expediente-evidencias.md`). Lo que sigue sin existir es la evaluación de riesgos, la
+documentación técnica del Anexo VII, la declaración UE de conformidad y el marcado CE: forman
+parte de la Práctica 2 y no están en el alcance de este laboratorio.
+
+Antes de dar por terminado el expediente se abrieron cinco enlaces (release, `SECURITY.md`,
+borrador de aviso con cuenta colaboradora, alertas CodeQL y milestone) y se ejecutaron dos
+comandos de verificación (`sha256sum -c SHA256SUMS` y `gh attestation verify`). El revisor, como
+auditor externo, dejará su comprobación en el PR final.

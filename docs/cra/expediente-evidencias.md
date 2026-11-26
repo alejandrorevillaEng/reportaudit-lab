@@ -8,6 +8,9 @@
 > Índice de evidencias frente a la Cyber Resilience Act (Reglamento (UE) 2024/2847).
 > No es una declaración de conformidad: dice qué está demostrado y cómo comprobarlo.
 > Todas las fechas se refieren al commit etiquetado `f95eabf` (tag `v1.0.0`).
+> Los enlaces de *Security* (aviso, Code scanning, canal privado y ajustes) requieren sesión de
+> GitHub; el borrador de aviso requiere además ser colaborador del aviso. Se comprobaron con la
+> cuenta del repositorio. El resto de enlaces son públicos.
 
 | # | Requisito | Referencia | Evidencia en ReportAudit | Enlace | Cómo lo verifica un tercero |
 |---|---|---|---|---|---|
@@ -22,7 +25,7 @@
 | 9 | Dirección de contacto para vulnerabilidades | Anexo I, Parte II, 6 | Enlace *Report a vulnerability* del repositorio | [Canal privado](https://github.com/alejandrorevillaEng/reportaudit-lab/security/advisories/new), [SECURITY.md](https://github.com/alejandrorevillaEng/reportaudit-lab/blob/main/SECURITY.md) | Abrir la URL sin sesión iniciada: GitHub ofrece el formulario privado, no un Issue público |
 | 10 | Distribución segura de las actualizaciones | Anexo I, Parte II, 7 | Release firmada con `SHA256SUMS` y dos atestaciones Sigstore; verificación con archivo manipulado fallida | [Release v1.0.0](https://github.com/alejandrorevillaEng/reportaudit-lab/releases/tag/v1.0.0), [ejecución](https://github.com/alejandrorevillaEng/reportaudit-lab/actions/runs/45874401352), [verificación](https://github.com/alejandrorevillaEng/reportaudit-lab/blob/main/docs/evidencias/verificacion-release-v1.0.0.txt) | `sha256sum -c SHA256SUMS` → OK; `gh attestation verify reportaudit-1.0.0.tar.gz --repo alejandrorevillaEng/reportaudit-lab` → exit 0; con `alterado.tar.gz` → HTTP 404 |
 | 11 | Período de soporte declarado | Art. 13.8 | `SECURITY.md` declara soporte hasta 2031-10-31 (cinco años desde v1.0.0) | [SECURITY.md](https://github.com/alejandrorevillaEng/reportaudit-lab/blob/main/SECURITY.md) | Abrir `SECURITY.md` → *Supported Versions* y comprobar la fecha de fin de soporte |
-| 12 | Trazabilidad: cada cambio nace de un Issue y entra por un PR revisado | Buena práctica (no es un requisito literal) | Milestone con 13 Issues cerrados; PRs con plantilla internacional; `main` protegida con 4 checks y 1 aprobación | [Milestone 1](https://github.com/alejandrorevillaEng/reportaudit-lab/milestone/1), [PR #14](https://github.com/alejandrorevillaEng/reportaudit-lab/pull/14), [protección de main](https://github.com/alejandrorevillaEng/reportaudit-lab/settings/branches) | `gh issue list --repo alejandrorevillaEng/reportaudit-lab --milestone 'Lab 1 - Secure supply chain' --state closed` → 13; `gh api repos/alejandrorevillaEng/reportaudit-lab/branches/main/protection --jq '.required_status_checks.contexts'` → 4 checks |
+| 12 | Trazabilidad: cada cambio nace de un Issue y entra por un PR revisado | Buena práctica (no es un requisito literal) | Milestone con 13 Issues cerrados; PRs con plantilla internacional; `main` protegida con 4 checks y 1 aprobación | [Milestone 1](https://github.com/alejandrorevillaEng/reportaudit-lab/milestone/1), [PR #14](https://github.com/alejandrorevillaEng/reportaudit-lab/pull/14), [PR #24: puertas obligatorias](https://github.com/alejandrorevillaEng/reportaudit-lab/pull/24) | `gh issue list --repo alejandrorevillaEng/reportaudit-lab --milestone 'Lab 1 - Secure supply chain' --state closed` → 13; `gh api repos/alejandrorevillaEng/reportaudit-lab/branches/main/protection --jq '.required_status_checks.contexts'` → 4 checks |
 
 ## Lo que este expediente todavía no incluye
 

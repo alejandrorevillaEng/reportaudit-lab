@@ -209,7 +209,7 @@ Trivy 0.74.0 informó de **13 vulnerabilidades** en `requirements.txt` (tipo `pi
 - [x] Colaborador revisor `isramrtnz` añadido y aceptado.
 - [x] Proyecto de SonarQube Cloud con `SONAR_TOKEN` en Actions y claves reales en `sonar-project.properties`.
 - [x] Captura del commit bloqueado por Semgrep (`docs/evidencias/pre-commit-bloqueo.txt` + captura en el Word).
-- [x] Alertas de CodeQL en estado Fixed tras la corrección.
+- [x] Las dos alertas de seguridad de CodeQL (`py/sql-injection` y `py/weak-sensitive-data-hashing`) están en estado **Fixed**. Las 22 alertas abiertas que muestra *Code scanning* son del análisis de Scorecard (Pinned-Dependencies, Code-Review, etc.), no vulnerabilidades de CodeQL; están explicadas en la sección S.
 - [x] `docs/evidencias/` con SBOM antes/después, salidas de Grype y Trivy antes/después y VEX.
 - [x] PR de auditoría con la plantilla internacional, tabla de hallazgos, VEX enlazado y credenciales a rotar declaradas.
 - [x] Secciones O–T y documentación final completadas.
